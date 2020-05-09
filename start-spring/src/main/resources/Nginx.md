@@ -21,12 +21,36 @@
     *http块（http全局块，文件引入，MIME-TYPE，日志，连接超时时间，单连接请求上限）
            （server块（全局server块）（location块））
 ## Nginx配置实例1-反向代理
-
+* 实例一：我们想在浏览器输入 192.168.17.129：80  访问linux的tomcat主页 127.0.0.1：8080
+  就需要配置nginx: server_name 192.168.17.129 listen 80
+           proxy_pass   http://127.0.0.1:8080
+* 实例二：访问127.0.0.1：9001/edu 跳转到127.0.0.1：8080
+          访问127.0.0.1：9001/vod 跳转到127.0.0.1：8081
+  就需要配置nginx: server_name 192.168.17.129 listen 9001
+           location需要用正则过滤
+           location ~ /edu/ {
+            proxy_pass   http://127.0.0.1:8080
+           }
+           location ~ /vod/ {
+            proxy_pass   http://127.0.0.1:8081
+           }
+           
 ## Nginx配置实例2-负载均衡
-
+* 实例三：我们想在浏览器输入 192.168.17.129/edu/a.html 均衡负载到8080 8081端口上
+    我们需要配置nginx。策略包含：轮询（默认），权重，IP Hash，far(根据响应时间)
+    
+        //负载均衡的服务列表
+            upstream myserver{
+                server 192.168.17.129:8080;
+                server 192.168.17.129:8081;
+            }
+        //location里面加个属性
+           location / {
+            proxy_pass   http://myserver;
+           }
 ## Nginx配置实例3-动静分离
-
+* 将动态请求和静态请求分离，可以理解成使用nginx处理静态页面，tomcat处理动态页面
 ## Nginx高可用集群
-
+* 可以借助keepalive做高可用，两台Nginx，一台主一台备份
 ## Nginx原理
 
